@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Tomasulo Simulator</title>
+    <link href="index.css" rel="stylesheet"/>
+    <script src="jquery.min.js"></script>
+    <script src="vue.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="semantic.min.css">
+    <script src="semantic.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <div class="ui secondary menu">
+        <a class="item" v-on:click="$('#loadFromFile').click()">Load From File&nbsp;&nbsp;<i class="folder open icon"></i><input id="loadFromFile" type="file" hidden onchange="loadFile(this.files)"/></a>
+        <a class="item">Run One Step&nbsp;&nbsp;<i class="play icon"></i></a>
+        <div class="item">
+            <div class="ui action input">
+                <input type="number" placeholder="Run multi-steps" min="1" value="3" style="width: 70px">
+                <button class="ui icon button">
+                    <i class="forward icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="ui container">
+        <div class="ui three grid">
+            <div class="four wide column">
+                <h4 class="ui top attached block header">
+                    FP Op Queue
+                </h4>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th></th>
+                        <th>Op</th>
+                        <th>A</th>
+                        <th>B</th>
+                        <th>C</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="op in Ops">
+                        <td><div v-if="InP == op.id">-></div></td>
+                        <td>{{op.op}}</td>
+                        <td>{{op.A}}</td>
+                        <td>{{op.B}}</td>
+                        <td>{{op.C}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h4 class="ui top attached block header">
+                    Running State
+                </h4>
+                <div class="ui bottom attached segment">
+                    content
+                </div>
+            </div>
+            <div class="eight wide column">
+                <h4 class="ui top attached block header">
+                    Add Reservation Stations
+                </h4>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th>ID</th>
+                        <th>Operator</th>
+                        <th>Time</th>
+                        <th>Qj/Vj</th>
+                        <th>Qk/Vk</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="rs in AddRS">
+                        <td>{{rs.id}}</td>
+                        <td>{{rs.op}}</td>
+                        <td>{{(rs.time<0)?'Waiting':rs.time}}</td>
+                        <td>{{QVDisplay(rs.Qj, rs.Vj)}}</td>
+                        <td>{{QVDisplay(rs.Qk, rs.Vk)}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h4 class="ui top attached block header">
+                    Mult Reservation Stations
+                </h4>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th>ID</th>
+                        <th>Operator</th>
+                        <th>Time</th>
+                        <th>Qj/Vj</th>
+                        <th>Qk/Vk</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="rs in MultRS">
+                        <td>{{rs.id}}</td>
+                        <td>{{rs.op}}</td>
+                        <td>{{(rs.time<0)?'Waiting':rs.time}}</td>
+                        <td>{{QVDisplay(rs.Qj, rs.Vj)}}</td>
+                        <td>{{QVDisplay(rs.Qk, rs.Vk)}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h4 class="ui top attached block header">
+                    Load Buffers
+                </h4>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th>ID</th>
+                        <th>Busy</th>
+                        <th>Address</th>
+                        <th>Cache</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="buf in LoadBuf">
+                        <td>{{buf.id}}</td>
+                        <td>{{buf.busy != 0}}</td>
+                        <td>{{buf.A}}</td>
+                        <td>{{buf.Cache}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <h4 class="ui top attached block header">
+                    Store Buffers
+                </h4>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th>ID</th>
+                        <th>Busy</th>
+                        <th>Address</th>
+                        <th>Q</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="buf in StoreBuf">
+                        <td>{{buf.id}}</td>
+                        <td>{{buf.busy != 0}}</td>
+                        <td>{{buf.A}}</td>
+                        <td>{{buf.Q}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <h4 class="ui top attached block header">
+                    Memory
+                </h4>
+                <div class="ui middle attached segment">
+                    <div class="ui labeled input">
+                        <div class="ui label">Address</div>
+                        <input type="number" min="0" max="4095" value="0" placeholder="address" v-model="memorySetter.addr"/>
+                        <div class="ui label">Value</div>
+                        <input type="number" placeholder="value" value="0" v-model="memorySetter.value"/>
+                        <button class="ui button" v-on:click="storeMemory(memorySetter.addr, memorySetter.value)">Set</button>
+                    </div>
+                </div>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th>Address</th>
+                        <th>Value</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="addr in MemoryIndex">
+                        <td>{{addr}}</td>
+                        <td>{{Memory[addr]}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="four wide column">
+                <h4 class="ui top attached block header">
+                    FP Registers
+                </h4>
+                <table class="ui bottom attached table">
+                    <thead>
+                    <tr><th>ID</th>
+                        <th>Q/V</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr v-for="reg in FPRegisters">
+                        <td>F{{reg.id}}</td>
+                        <td>{{QVDisplay(reg.Q, reg.V)}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="index.js"></script>
+</html>
