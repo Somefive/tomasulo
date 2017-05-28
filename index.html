@@ -13,15 +13,16 @@
 <div id="app">
     <div class="ui secondary menu">
         <a class="item" v-on:click="$('#loadFromFile').click()">Load From File&nbsp;&nbsp;<i class="folder open icon"></i><input id="loadFromFile" type="file" hidden onchange="loadFile(this.files)"/></a>
-        <a class="item">Run One Step&nbsp;&nbsp;<i class="play icon"></i></a>
+        <a class="item" onclick="runOneStep()">Run One Step&nbsp;&nbsp;<i class="play icon"></i></a>
         <div class="item">
             <div class="ui action input">
-                <input type="number" placeholder="Run multi-steps" min="1" value="3" style="width: 70px">
-                <button class="ui icon button">
+                <input type="number" id="n-step" placeholder="Run multi-steps" min="1" value="3" style="width: 70px">
+                <button class="ui icon button" onclick="runNStep($('#n-step').val())">
                     <i class="forward icon"></i>
                 </button>
             </div>
         </div>
+        <div class="item">Time: {{timestamp}}</div>
     </div>
     <div class="ui container">
         <div class="ui three grid">
@@ -70,7 +71,7 @@
                     <tr v-for="rs in AddRS">
                         <td>{{rs.id}}</td>
                         <td>{{rs.op}}</td>
-                        <td>{{(rs.time<0)?'Waiting':rs.time}}</td>
+                        <td>{{TimeDisplay(rs.time)}}</td>
                         <td>{{QVDisplay(rs.Qj, rs.Vj)}}</td>
                         <td>{{QVDisplay(rs.Qk, rs.Vk)}}</td>
                     </tr>
@@ -91,7 +92,7 @@
                     <tr v-for="rs in MultRS">
                         <td>{{rs.id}}</td>
                         <td>{{rs.op}}</td>
-                        <td>{{(rs.time<0)?'Waiting':rs.time}}</td>
+                        <td>{{TimeDisplay(rs.time)}}</td>
                         <td>{{QVDisplay(rs.Qj, rs.Vj)}}</td>
                         <td>{{QVDisplay(rs.Qk, rs.Vk)}}</td>
                     </tr>
@@ -103,14 +104,14 @@
                 <table class="ui bottom attached table">
                     <thead>
                     <tr><th>ID</th>
-                        <th>Busy</th>
+                        <th>Time</th>
                         <th>Address</th>
                         <th>Cache</th>
                     </tr></thead>
                     <tbody>
                     <tr v-for="buf in LoadBuf">
                         <td>{{buf.id}}</td>
-                        <td>{{buf.busy != 0}}</td>
+                        <td>{{TimeDisplay(buf.time)}}</td>
                         <td>{{buf.A}}</td>
                         <td>{{buf.Cache}}</td>
                     </tr>
@@ -123,14 +124,14 @@
                 <table class="ui bottom attached table">
                     <thead>
                     <tr><th>ID</th>
-                        <th>Busy</th>
+                        <th>Time</th>
                         <th>Address</th>
                         <th>Q</th>
                     </tr></thead>
                     <tbody>
                     <tr v-for="buf in StoreBuf">
                         <td>{{buf.id}}</td>
-                        <td>{{buf.busy != 0}}</td>
+                        <td>{{TimeDisplay(buf.time)}}</td>
                         <td>{{buf.A}}</td>
                         <td>{{buf.Q}}</td>
                     </tr>
