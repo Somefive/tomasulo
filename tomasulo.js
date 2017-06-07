@@ -362,7 +362,7 @@ function execute() {
 		for (j=3;j<6;++j) {
 			if (vue.Buffer[j].isReady()) {
 				vue.Buffer[j].run();
-				vue.Buffer[j].operation.execute = vue.timestamp+1;
+				vue.Buffer[j].operation.execute = vue.timestamp;
 				break;
 			}
 		}
@@ -395,4 +395,8 @@ function execute() {
 function runNStep(n) {
 	for (var i=0;i<n;++i)
 		runOneStep();
+}
+
+for (let _i=0;_i<20;++_i) {
+	storeMemory(_i, _i);
 }
