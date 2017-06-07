@@ -68,7 +68,7 @@ class QV {
 	update(index, value) {
 		if (this.Q == index) {
 			this.Q = 0;
-			this.V = index;
+			this.V = value;
 		}
 	}
 }
@@ -308,7 +308,7 @@ function execute() {
 		vue.RS[i].run();
 		if (vue.RS[i].time == 0) {
 			vue.RS[i].state = 'WRITING';
-			vue.RS[i].operation.writeResult = vue.timestamp;
+			vue.RS[i].operation.writeResult = vue.timestamp+1;
 			notify[vue.RS[i].id] = (vue.RS[i].operation.operator == 'ADDD')
 				? (vue.RS[i].j.V + vue.RS[i].k.V)
 				: (vue.RS[i].j.V - vue.RS[i].k.V);
@@ -330,7 +330,7 @@ function execute() {
 		vue.RS[i].run();
 		if (vue.RS[i].time == 0) {
 			vue.RS[i].state = 'WRITING';
-			vue.RS[i].operation.writeResult = vue.timestamp;
+			vue.RS[i].operation.writeResult = vue.timestamp+1;
 			notify[vue.RS[i].id] = (vue.RS[i].operation.operator == 'MULD')
 				? (vue.RS[i].j.V * vue.RS[i].k.V)
 				: (vue.RS[i].j.V / vue.RS[i].k.V);
@@ -351,7 +351,7 @@ function execute() {
 		vue.Buffer[i].run();
 		if (vue.Buffer[i].time == 0) {
 			vue.Buffer[i].state = 'WRITING';
-			vue.Buffer[i].operation.writeResult = vue.timestamp;
+			vue.Buffer[i].operation.writeResult = vue.timestamp+1;
 			++vue.RunningMemory;
 			notify[vue.Buffer[i].id] = loadMemory(vue.Buffer[i].A);
 		}
@@ -362,7 +362,7 @@ function execute() {
 		for (j=3;j<6;++j) {
 			if (vue.Buffer[j].isReady()) {
 				vue.Buffer[j].run();
-				vue.Buffer[j].operation.execute = vue.timestamp;
+				vue.Buffer[j].operation.execute = vue.timestamp+1;
 				break;
 			}
 		}
@@ -376,6 +376,7 @@ function execute() {
 		}
 	}
 	//notify
+	console.log(notify);
 	for (var index in notify) {
 		value = notify[index];
 		for (i=0;i<5;++i) {
