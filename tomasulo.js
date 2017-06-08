@@ -248,7 +248,7 @@ function issue() {
 	if (inst.operator == 'ADDD' || inst.operator == 'SUBD') {
 		for (i=0;i<3;++i) if (vue.RS[i].state == 'IDLE') break;
 		if (i == 3) return;
-		vue.RS[i].state = 'WAITING';
+		vue.RS[i].state = 'ISSUED';
 		vue.RS[i].operation = inst;
 		vue.RS[i].j.setQV(vue.Registers[inst.operandB].QV);
 		vue.RS[i].k.setQV(vue.Registers[inst.operandC].QV);
@@ -257,7 +257,7 @@ function issue() {
 	} else if (inst.operator == 'MULD' || inst.operator == 'DIVD') {
 		for (i=3;i<5;++i) if (vue.RS[i].state == 'IDLE') break;
 		if (i == 5) return;
-		vue.RS[i].state = 'WAITING';
+		vue.RS[i].state = 'ISSUED';
 		vue.RS[i].operation = inst;
 		vue.RS[i].j.setQV(vue.Registers[inst.operandB].QV);
 		vue.RS[i].k.setQV(vue.Registers[inst.operandC].QV);
@@ -267,7 +267,7 @@ function issue() {
 		for (i=0;i<3;++i) if (vue.Buffer[i].state == 'IDLE') break;
 		if (i == 3) return;
 		vue.Buffer[i].operation = inst;
-		vue.Buffer[i].state = 'WAITING';
+		vue.Buffer[i].state = 'ISSUED';
 		vue.Buffer[i].Seq = ++MemoryBuffer.Seq;
 		vue.Buffer[i].A = inst.operandB;
 		vue.Buffer[i].time = 2;
@@ -276,7 +276,7 @@ function issue() {
 		for (i=3;i<6;++i) if (vue.Buffer[i].state == 'IDLE') break;
 		if (i == 6) return;
 		vue.Buffer[i].operation = inst;
-		vue.Buffer[i].state = 'WAITING';
+		vue.Buffer[i].state = 'ISSUED';
 		vue.Buffer[i].Seq = ++MemoryBuffer.Seq;
 		vue.Buffer[i].A = inst.operandB;
 		vue.Buffer[i].time = 2;
@@ -375,6 +375,8 @@ function execute() {
 			++vue.RunningMemory;
 		}
 	}
+	for (i=0;i<5;++i) if (vue.RS[i].state == 'ISSUED') vue.RS[i].state = 'WAITING';
+	for (i=0;i<6;++i) if (vue.Buffer[i].state == 'ISSUED') vue.Buffer[i].state = 'WAITING';
 	//notify
 	console.log(notify);
 	for (var index in notify) {
